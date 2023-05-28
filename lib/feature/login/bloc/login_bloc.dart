@@ -9,13 +9,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   LoginBloc({required this.loginUseCase}) : super(InitialLoginState()) {
     on<SubmittingLoginEvent>((event, emit) async {
-      emit(LoadingLoginState());
-      final result = await loginUseCase
-          .call(LoginParams(email: event.email, password: event.password));
+      if (event.email.isNotEmpty && event.password.isNotEmpty) {
+        emit(LoadingLoginState());
+        final result = await loginUseCase
+            .call(LoginParams(email: event.email, password: event.password));
 
-      print("Bloc -> ${result.isRight()}");
-      result.fold((l) => emit(ErrorLoginState(l.message)),
-          (r) => emit(SuccessLoginState()));
+        print("Bloc -> ${result.isRight()}");
+        result.fold((l) => emit(ErrorLoginState(l.message)),
+            (r) => emit(SuccessLoginState()));
+      } else {
+        emit(ErrorLoginState("Lengkapi form"));
+      }
     });
   }
 }
